@@ -1,3 +1,4 @@
+from collections import defaultdict
 from unittest import TestCase
 
 from hamcrest import assert_that, equal_to
@@ -8,18 +9,25 @@ BLUE = (0, 0, 255)
 
 
 class AbstractClock():
-    def tick(self):
+    def tick(self) -> bool:
         pass
 
 
 class MockClock(AbstractClock):
-    def __init__(self):
-        self.limit = 5*30*60
+    def __init__(self, limit=31*60):
+        self.limit = limit
         self.count = 0
+        self.assertions = defaultdict(list)
 
     def tick(self):
         self.count += 1
+        if self.count in self.assertions:
+            for assertion in self.assertions[self.count]:
+                assertion() # run the relevant function
         return self.count <= self.limit
+
+    def at(self, time, *fns):
+        self.assertions[time]+=fns
 
 
 class MockTofSensor:
@@ -51,6 +59,7 @@ class MockBuzzer(AbstractBuzzer):
     def is_buzzing(self):
         return self.buzzing
 
+
 class MockLed(object):
     def __init__(self):
         self.color = (0, 0, 0)
@@ -63,6 +72,7 @@ class State:
 
 class PomodoroRunning(State):
     pass
+
 
 pomodoro_running = PomodoroRunning()
 
@@ -86,8 +96,7 @@ class PomodoroTimer:
     def run(self):
         state = Waiting()
         self.led.color = BLUE
-        while True:
-            self.clock.tick()
+        while self.clock.tick():
             distance = self.tof_sensor.distance()
             (state, buzzing, colour) = state.update(distance)
             self.buzzer.buzz(buzzing)
@@ -99,33 +108,27 @@ class Script:
         self._events = events
 
 
-
 class LazyTest(TestCase):
     def setUp(self):
-        self.clock = MockClock()
         self.tof_sensor = MockTofSensor()
         self.buzzer = MockBuzzer()
         self.led = MockLed()
-        self.eventQueue = []
+        self.clock = MockClock()
         self.pom = PomodoroTimer(self.clock, self.tof_sensor, self.buzzer, self.led)
 
     def test_can_run_a_single_pomodoro(self):
-        script = Script(self.buzzer_is_quiet,
-                        self.person_appears,
-                        self.led_is_green,
-                        self.wait(minutes=30),
-                        self.buzzer_is_buzzing,
-                        self.wait(minutes=0, seconds=1),
-                        self.buzzer_is_quiet)
+        self.clock.at(1, self.buzzer_is_quiet)
+        self.clock.at(1, self.led_is_blue)
         self.pom.run()
 
     def buzzer_is_quiet(self):
-        if self.buzzer.is_quiet():
-            return
-        self.fail('buzzer is not buzzing')
+        assert_that(not self.buzzer.buzzing,'buzzer is not quiet')
 
-    def led_is_green(self):
-        pass
+    def led_is_blue(self):
+        assert_that(self.led.color, equal_to(BLUE))
+
+
+
 
     def wait(self, minutes, seconds=0):
         pass
