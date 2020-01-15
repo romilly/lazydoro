@@ -7,7 +7,6 @@ import board
 import busio
 
 import explorerhat as eh
-import adafruit_vl53l0x
 import RPi.GPIO as GPIO
 
 
