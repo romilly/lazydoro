@@ -1,5 +1,23 @@
 # Project journal for Lazydoro
 
+## Monday 28 January 2019
+
+I started the project and got the Adafruit ToF sensor working with an M0 Feather Express.
+
+
+
+
+## Thursday 31 January 2019
+
+I've lost my code :(
+
+Mu is great for beginners, but no version control!
+
+Code is back, and working, and I have added a piezo buzzer: an LS03803 from CPC which
+works off 3 v and is loud enough.
+
+Tomorrow I will solder it onto a Perma-proto. It's shaping up to be a very nice project. 
+
 ## Saturday 02 February 2019
 
 I didn't solder up cos I realised I can use a trinket m0, which will be smaller and cheaper.
@@ -23,23 +41,14 @@ I'll need to mock
 1. ToF sensor.
 
 
+## Monday 04 February 2019
+
+I've soldered the trinket. 
+
+Here's the pinout![Trinket m0 pinout](resources/images/adafruit/trinket-m0/adafruit_products_Adafruit_Trinket_M0.png)
 
 
-## Thursday 31 January 2019
+## Wednesday 13 March 2019
 
-I've lost my code :(
-
-Mu is great for beginners, but no version control!
-
-Code is back, and working, and I have added a piezo buzzer: an LS03803 from CPC which
-works off 3 v and is loud enough.
-
-Tomorrow I will solder it onto a Perma-proto. It's shaping up to be a very nice project. 
-
-## Monday 28 January 2019
-
-I started the project and got the Adafruit ToF sensor working with an M0 Feather Express.
-
-
-
+Wow - over a month since I last worked on the project! This should show how clearly I captured intent :)
 

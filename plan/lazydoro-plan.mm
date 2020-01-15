@@ -148,11 +148,8 @@
 <node TEXT="Richard Kirby" ID="ID_1381455256" CREATED="1548690159427" MODIFIED="1548690167606"/>
 </node>
 </node>
-<node TEXT="try latest release with OLED" ID="ID_1448067458" CREATED="1549043651302" MODIFIED="1549043668468">
-<node TEXT="install new CP" ID="ID_1001627580" CREATED="1549043671305" MODIFIED="1549043678772"/>
-<node TEXT="install new lib" ID="ID_473616814" CREATED="1549043679177" MODIFIED="1549043685020"/>
-<node TEXT="try example code" ID="ID_1834766559" CREATED="1549043685473" MODIFIED="1549043689060"/>
-</node>
+<node TEXT="prepare raspint talk" ID="ID_1448035341" CREATED="1578843182255" MODIFIED="1578902537922" LINK="../../RareBlog/presentations/rp-lazydoro-20200129-plan.mm"/>
+<node TEXT="marketing" ID="ID_1011366949" CREATED="1578903178260" MODIFIED="1578903217685" LINK="../../explorer-hat/plan/HAT-Tricks-SalesAndMarketing.mm"/>
 </node>
 <node TEXT="Review" POSITION="left" ID="Freemind_Link_1153466861" CREATED="1266488259116" MODIFIED="1266488895851" COLOR="#fb1802">
 <icon BUILTIN="xmag"/>
@@ -237,6 +234,12 @@
 <node TEXT="circuitpython on raspberrypi" ID="ID_1032904171" CREATED="1548923428712" MODIFIED="1548923444995" LINK="https://learn.adafruit.com/circuitpython-on-raspberrypi-linux/overview"/>
 <node TEXT="Discord" ID="ID_1668928143" CREATED="1549042454691" MODIFIED="1549042458191"/>
 <node TEXT="https://www.planttext.com/" ID="ID_531842401" CREATED="1549117300794" MODIFIED="1549117300794" LINK="https://www.planttext.com/"/>
+<node TEXT="trinket m0" ID="ID_272480709" CREATED="1549290395528" MODIFIED="1549290433455" LINK="https://learn.adafruit.com/adafruit-trinket-m0-circuitpython-arduino/overview"/>
+<node TEXT="Adafruit CircuitPython Library for VL53L0X" ID="ID_1442000001" CREATED="1578842816856" MODIFIED="1578843106234" LINK="https://github.com/adafruit/Adafruit_CircuitPython_VL53L0X"/>
+<node TEXT="neopixels" ID="ID_353961040" CREATED="1579022817386" MODIFIED="1579022823361">
+<node TEXT="https://learn.adafruit.com/adafruit-neopixel-uberguide/the-magic-of-neopixels" ID="ID_1529517919" CREATED="1579022735550" MODIFIED="1579022735550" LINK="https://learn.adafruit.com/adafruit-neopixel-uberguide/the-magic-of-neopixels"/>
+<node TEXT="https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring" ID="ID_1377165932" CREATED="1579022815695" MODIFIED="1579022815695" LINK="https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring"/>
+</node>
 </node>
 </node>
 </map>
