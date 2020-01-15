@@ -41,18 +41,18 @@ class HatLEDs(Led):
 
     def set_color(self, color):
         self.color = color
-        eh.lights.off()
+        eh.light.off()
         if color == Led.RED:
-            eh.lights.red.on()
+            eh.light.red.on()
             return
         if color == Led.YELLOW:
-            eh.lights.yellow.on()
+            eh.light.yellow.on()
             return
         if color == Led.BLUE:
-            eh.lights.blue.on()
+            eh.light.blue.on()
             return
         if color == Led.GREEN:
-            eh.lights.green.on()
+            eh.light.green.on()
             return
 
 
