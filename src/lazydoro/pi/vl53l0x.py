@@ -3,7 +3,7 @@ import busio
 
 import adafruit_vl53l0x
 
-from src.lazydoro.pi.lazy_oo import ToFSensor
+from lazydoro.pi.lazy_oo import ToFSensor
 
 def average(values):
     return sum(values)/len(values)
