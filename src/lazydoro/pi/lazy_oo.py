@@ -82,9 +82,9 @@ class Running(State):
         if not person_there:
             return Resting(self.schedule), False, Led.YELLOW
         if self.due():
-            return self, False, Led.GREEN
-        else:
             return self, True, Led.RED
+        else:
+            return self, False, Led.GREEN
 
 
 class Waiting(State):
