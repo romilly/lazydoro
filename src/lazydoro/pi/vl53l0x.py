@@ -5,6 +5,7 @@ import adafruit_vl53l0x
 
 from lazydoro.pi.lazy_oo import ToFSensor
 
+
 def average(values):
     return sum(values)/len(values)
 
