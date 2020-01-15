@@ -8,7 +8,6 @@ import adafruit_vl53l0x
 import RPi.GPIO as GPIO
 
 
-
 def average(values):
     return sum(values)/len(values)
 

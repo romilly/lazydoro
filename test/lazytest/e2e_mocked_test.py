@@ -10,8 +10,7 @@ from src.lazydoro.pi.lazy_oo import Clock, ToFSensor, Buzzer, Schedule, Led, Pom
 DURATION = 10
 BREAK = 3
 GRACE = 2
-
-
+TIMEOUT = 3
 
 
 class MockClock(Clock):
@@ -83,6 +82,7 @@ class LazydoroTest(TestCase):
         self.led = MockLed()
         self.clock = MockClock()
         self.pom = PomodoroTimer(self.clock, self.tof_sensor, self.buzzer, self.led)
+        self.schedule = Schedule(DURATION, BREAK, GRACE, TIMEOUT)
 
     def test_can_run_a_single_pomodoro(self):
         self.after(1, self.buzzer_is_quiet, self.led_is_blue)
@@ -92,7 +92,7 @@ class LazydoroTest(TestCase):
         self.after(1, self.buzzer_is_buzzing, self.led_is_red)
         self.after(1, self.person_leaves)
         self.after(1, self.buzzer_is_quiet, self.led_is_yellow)
-        self.pom.run(Schedule(DURATION, BREAK, GRACE))
+        self.pom.run(self.schedule)
 
     def after(self, time: int, *fns):
         self.clock.after(time, *fns)

@@ -2,10 +2,11 @@ from abc import ABC, abstractmethod
 
 
 class Schedule():
-    def __init__(self, pomodoro_duration, break_duration, grace_period):
+    def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int):
         self.pomodoro_duration = pomodoro_duration
         self.break_duration = break_duration
         self.grace_period = grace_period
+        self.timeout = timeout
 
 
 class Clock(ABC):
@@ -51,8 +52,10 @@ class State(ABC):
 
     @abstractmethod
     def update(self, person_there: bool) -> ('State', bool, str):
-        self.ticks += 1
         pass
+
+    def tick(self):
+        self.ticks += 1
 
 
 class Resting(State):
@@ -61,21 +64,21 @@ class Resting(State):
         self.duration = schedule.break_duration
 
     def update(self, person_there: bool) -> ('State', bool, str):
-        State.update(self, person_there)
+        self.tick()
         if person_there:
-            return PomodoroRunning(self.schedule), False, Led.GREEN
+            return Running(self.schedule), False, Led.GREEN
         if self.due():
-            return self, True, Led.YELLOW
+            return Summoning(self.schedule), True, Led.YELLOW
         return self, False, Led.YELLOW
 
 
-class PomodoroRunning(State):
+class Running(State):
     def __init__(self, schedule):
         State.__init__(self, schedule)
         self.duration =  schedule.pomodoro_duration
 
     def update(self, person_there) -> ('State', bool, str):
-        State.update(self, person_there)
+        self.tick()
         if not person_there:
             return Resting(self.schedule), False, Led.YELLOW
         if self.due():
@@ -91,9 +94,23 @@ class Waiting(State):
 
     def update(self, person_there: bool):
         if person_there:
-            return PomodoroRunning(self.schedule), False, Led.GREEN
+            return Running(self.schedule), False, Led.GREEN
         else:
             return self, False, Led.BLUE
+
+
+class Summoning(State):
+    def __init__(self, schedule):
+        State.__init__(self, schedule)
+        self.duration = schedule.timeout
+
+    def update(self, person_there: bool) -> ('State', bool, str):
+        self.tick()
+        if person_there:
+            return Running(self.schedule), False, Led.GREEN
+        if self.due():
+            return Waiting(self.schedule), False, Led.BLUE
+        return self, True, Led.YELLOW
 
 
 class PomodoroTimer:
