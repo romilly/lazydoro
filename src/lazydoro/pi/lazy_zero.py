@@ -1,5 +1,3 @@
-from time import sleep
-
 from lazydoro.pi.blinkt_leds import BlinktLEDs
 from lazydoro.pi.hat_clock import HatClock
 from lazydoro.pi.lazy_oo import Schedule, PomodoroTimer, Clock
