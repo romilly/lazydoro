@@ -56,17 +56,12 @@ class HatLEDs(Led):
             return
 
 
-
-
-
-
-
-tof_sensor = VL53L0XToF()
-
-#schedule = Schedule(25*60, 5*60, 60, 60)
-schedule = Schedule(20, 5, 3, 3)
-clock = HatClock()
-buzzer = HatBuzzer()
-led = HatLEDs()
-pom = PomodoroTimer(clock, tof_sensor, buzzer, led)
-pom.run(schedule)
+if __name__ == '__main__':
+    tof_sensor = VL53L0XToF()
+    #schedule = Schedule(25*60, 5*60, 60, 60)
+    schedule = Schedule(20, 5, 3, 3)
+    clock = HatClock()
+    buzzer = HatBuzzer()
+    led = HatLEDs()
+    pom = PomodoroTimer(clock, tof_sensor, buzzer, led)
+    pom.run(schedule)

@@ -48,7 +48,7 @@ class State(ABC):
         self.duration = 0
 
     def due(self):
-        return self.ticks < self.duration
+        return self.ticks > self.duration
 
     @abstractmethod
     def update(self, person_there: bool) -> ('State', bool, str):
@@ -68,8 +68,9 @@ class Resting(State):
         if person_there:
             return Running(self.schedule), False, Led.GREEN
         if self.due():
-            return Summoning(self.schedule), True, Led.YELLOW
-        return self, False, Led.YELLOW
+            return Summoning(self.schedule), True, Led.RED
+        else:
+            return self, False, Led.YELLOW
 
 
 class Running(State):
@@ -81,7 +82,8 @@ class Running(State):
         self.tick()
         if not person_there:
             return Resting(self.schedule), False, Led.YELLOW
-        if self.due():
+        due = self.due()
+        if due:
             return self, True, Led.RED
         else:
             return self, False, Led.GREEN
