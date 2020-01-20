@@ -1,6 +1,7 @@
 from time import sleep
 
 from lazydoro.pi.lazy_oo import Schedule, PomodoroTimer, Clock, Buzzer, Led
+from lazydoro.pi.pwmbuzzer import PwmBuzzer
 from lazydoro.pi.vl53l0x import VL53L0XToF
 
 import board
@@ -14,22 +15,6 @@ class HatClock(Clock):
     def tick(self) -> bool:
         sleep(1)
         return True
-
-
-class HatBuzzer(Buzzer):
-    def __init__(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(18, GPIO.OUT)
-        self.buzzer = GPIO.PWM(18, 400)
-
-    def buzz(self, status):
-        self.beep(1, 400)
-
-    def beep(self, seconds, freq):
-        self.buzzer.ChangeFrequency(freq)
-        self.buzzer.start(50)
-        sleep(seconds)
-        self.buzzer.stop()
 
 
 class HatLEDs(Led):
@@ -61,7 +46,7 @@ if __name__ == '__main__':
     #schedule = Schedule(25*60, 5*60, 60, 60)
     schedule = Schedule(20, 5, 3, 3)
     clock = HatClock()
-    buzzer = HatBuzzer()
+    buzzer = PwmBuzzer(pin=18)
     led = HatLEDs()
     pom = PomodoroTimer(clock, tof_sensor, buzzer, led)
     pom.run(schedule)
