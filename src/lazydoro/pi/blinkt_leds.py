@@ -16,7 +16,7 @@ class BlinktLEDs(Led):
             set_pixel(0, 255, 0, 0)
             return
         if color == Led.YELLOW:
-            set(0, 0, 255, 255)
+            set_pixel(0, 0, 255, 255)
             return
         if color == Led.BLUE:
             set_pixel(0, 0, 0, 255)
