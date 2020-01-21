@@ -54,17 +54,21 @@ class MockTofSensor(ToFSensor):
 
 
 class MockBuzzer(Buzzer):
-    def buzz(self, status: bool):
-        self.buzzing = status
+    def buzz(self):
+        self.buzzing = True
 
     def __init__(self):
         self.buzzing = False
 
     def is_quiet(self):
-        return not self.buzzing
+        not_buzzing = not self.buzzing
+        self.buzzing = False
+        return not_buzzing
 
     def is_buzzing(self):
-        return self.buzzing
+        result = self.buzzing
+        self.buzzing = False
+        return result
 
 
 class MockLed(Led):

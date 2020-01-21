@@ -27,7 +27,7 @@ class ToFSensor(ABC):
 
 class Buzzer(ABC):
     @abstractmethod
-    def buzz(self, status):
+    def buzz(self):
         pass
 
 class Led(ABC):
@@ -148,7 +148,8 @@ class PomodoroTimer:
         while self.clock.tick():
             (state, buzzing, color) = state.update(self.person_there())
             print(state.name())
-            self.buzzer.buzz(buzzing)
+            if buzzing:
+                self.buzzer.buzz()
             self.led.set_color(color)
             print(self.tof_sensor.distance())
 
