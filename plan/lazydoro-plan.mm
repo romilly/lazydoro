@@ -241,6 +241,11 @@
 <node TEXT="https://learn.adafruit.com/adafruit-neopixel-uberguide/the-magic-of-neopixels" ID="ID_1529517919" CREATED="1579022735550" MODIFIED="1579022735550" LINK="https://learn.adafruit.com/adafruit-neopixel-uberguide/the-magic-of-neopixels"/>
 <node TEXT="https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring" ID="ID_1377165932" CREATED="1579022815695" MODIFIED="1579022815695" LINK="https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring"/>
 </node>
+<node TEXT="PWM" ID="ID_157403470" CREATED="1579618557551" MODIFIED="1579618560692">
+<node TEXT="https://raspi.tv/2013/rpi-gpio-0-5-2a-now-has-software-pwm-how-to-use-it" ID="ID_948492459" CREATED="1579618561702" MODIFIED="1579618561702" LINK="https://raspi.tv/2013/rpi-gpio-0-5-2a-now-has-software-pwm-how-to-use-it"/>
+<node TEXT="https://raspi.tv/2013/rpi-gpio-basics-4-setting-up-rpi-gpio-numbering-systems-and-inputs" ID="ID_1453752971" CREATED="1579618538519" MODIFIED="1579618538519" LINK="https://raspi.tv/2013/rpi-gpio-basics-4-setting-up-rpi-gpio-numbering-systems-and-inputs"/>
+<node TEXT="https://raspi.tv/2013/rpi-gpio-basics-3-how-to-exit-gpio-programs-cleanly-avoid-warnings-and-protect-your-pi" ID="ID_229582255" CREATED="1579618618139" MODIFIED="1579618618139" LINK="https://raspi.tv/2013/rpi-gpio-basics-3-how-to-exit-gpio-programs-cleanly-avoid-warnings-and-protect-your-pi"/>
+</node>
 </node>
 </node>
 </map>
