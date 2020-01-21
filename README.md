@@ -46,13 +46,26 @@ Here's a fritzing diagram which shows the connections and approximate physical l
 
 You'll need to know how to set up and connect to a Raspberry Pi zero. If you don't yet, you'll find great advice on the official Raspberry Pi site. For this project you'll need  the current (buster) version of Rasbpian. The lite version is fine, though fuller versions are also OK. 
 
-###
+#### Prerequisites
 
-At some point I will put this up on PyPi.
+You'll need to install the libraries for RPi.GPIO, Adafruit VL53L0X annd Pimoroni Blinkt! library.
+
+    pip3 install RPi.GPIO
+    pip3 install adafruit-circuitpython-vl53l0x
+    curl https://get.pimoroni.com/blinkt | bash
+    
+#### Cloning/using this repository
+
+At some point I will make this available on PyPi.
 
 For now, you'll need to clone this repository into the directory of your choice on the Pi zero, change directory, extend your PYTHONPATH, and run the software using Python3.
 
-    git clone 
+    git clone https://github.com/romilly/lazydoro.git
+    cd lazydoro/src
+    export PYTHONAPTH='.'
+    python3 lazydoro/pi/lazy_zero.py
+    
+
 
 
 
