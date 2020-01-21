@@ -52,3 +52,13 @@ Here's the pinout![Trinket m0 pinout](resources/images/adafruit/trinket-m0/adafr
 
 Wow - over a month since I last worked on the project! This should show how clearly I captured intent :)
 
+
+## Tuesday 21 January 2020
+
+Lots of work not captured in the journal.
+
+I now have a working lazydoro with a Pi zero, a Pimoroni Blinkt! led array, a buzzer and an adafruit VL53L0X sensor.
+
+It uses an adafruit bonnet.
+
+![lazy-zero](resources/images/lazydoro/lazy-zero-cropped.jpg)
