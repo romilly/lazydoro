@@ -58,6 +58,10 @@ class State(ABC):
     def update(self, person_there: bool) -> ('State', bool, str):
         pass
 
+    @abstractmethod
+    def name(self) -> str:
+        pass
+
     def tick(self):
         self.ticks += 1
 
@@ -76,6 +80,9 @@ class Resting(State):
         else:
             return self, False, Led.YELLOW
 
+    def name(self) -> str:
+        return 'Resting'
+
 
 class Running(State):
     def __init__(self, schedule):
@@ -92,6 +99,9 @@ class Running(State):
         else:
             return self, False, Led.GREEN
 
+    def name(self) -> str:
+        return 'Running'
+
 
 class Waiting(State):
     def __init__(self, schedule):
@@ -104,8 +114,14 @@ class Waiting(State):
         else:
             return self, False, Led.BLUE
 
+    def name(self) -> str:
+        return 'Waiting'
+
 
 class Summoning(State):
+    def name(self) -> str:
+        return 'Summoning'
+
     def __init__(self, schedule):
         State.__init__(self, schedule)
         self.duration = schedule.timeout
