@@ -147,6 +147,7 @@ class PomodoroTimer:
         self.led.set_color(Led.BLUE)
         while self.clock.tick():
             (state, buzzing, color) = state.update(self.person_there())
+            print(state.name())
             self.buzzer.buzz(buzzing)
             self.led.set_color(color)
             print(self.tof_sensor.distance())
