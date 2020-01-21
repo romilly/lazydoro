@@ -10,7 +10,7 @@ if __name__ == '__main__':
     #schedule = Schedule(25*60, 5*60, 60, 60)
     schedule = Schedule(20, 5, 3, 3)
     clock = HatClock()
-    buzzer = PwmBuzzer(pin=18)
+    buzzer = PwmBuzzer(pin=6)
     led = BlinktLEDs()
     pom = PomodoroTimer(clock, tof_sensor, buzzer, led)
     pom.run(schedule)
