@@ -4,7 +4,7 @@ from time import sleep
 
 
 class PwmBuzzer(Buzzer):
-    def __init__(self, pin=19):
+    def __init__(self, pin=6):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
         self.buzzer = GPIO.PWM(pin, 400)
