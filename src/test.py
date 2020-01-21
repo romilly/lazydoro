@@ -17,3 +17,8 @@ class PwmBuzzer(Buzzer):
         self.buzzer.start(50)
         sleep(seconds)
         self.buzzer.stop()
+
+buzzer = PwmBuzzer()
+while True:
+    buzzer.beep(1,200)
+    sleep(1)
