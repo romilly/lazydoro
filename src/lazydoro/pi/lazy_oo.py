@@ -20,6 +20,11 @@ class ToFSensor(ABC):
     def is_someone_there(self):
         pass
 
+    @abstractmethod
+    def distance(self)-> int:
+        pass
+
+
 
 class Buzzer(ABC):
     @abstractmethod
@@ -129,6 +134,7 @@ class PomodoroTimer:
             (state, buzzing, color) = state.update(self.person_there())
             self.buzzer.buzz(buzzing)
             self.led.set_color(color)
+            print(self.tof_sensor.distance())
 
     def person_there(self):
         return self.tof_sensor.is_someone_there()

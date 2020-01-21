@@ -18,8 +18,12 @@ class VL53L0XToF(ToFSensor):
         self.ranges = 5*[1.1 * threshold]
 
     def is_someone_there(self):
+        self.ranges = self.ranges[1:] + [self.distance()]
+        return average(self.ranges) < self.threshold
+
+    def distance(self):
         distance = self.vl53.range
         while distance == 0:
             distance = self.vl53.range
-        self.ranges = self.ranges[1:] + [distance]
-        return average(self.ranges) < self.threshold
+        return distance
+
