@@ -25,7 +25,6 @@ class ToFSensor(ABC):
         pass
 
 
-
 class Buzzer(ABC):
     @abstractmethod
     def buzz(self, status):

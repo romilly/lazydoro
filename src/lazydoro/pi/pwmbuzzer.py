@@ -13,7 +13,6 @@ class PwmBuzzer(Buzzer):
         self.beep(1, 400)
 
     def beep(self, seconds, freq):
-        self.buzzer.ChangeFrequency(freq)
-        self.buzzer.start(50)
+        self.buzzer.start(freq)
         sleep(seconds)
         self.buzzer.stop()

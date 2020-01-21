@@ -37,6 +37,9 @@ class MockClock(Clock):
 
 
 class MockTofSensor(ToFSensor):
+    def distance(self) -> int:
+        return 0
+
     def __init__(self):
         self._person_there = False
 
