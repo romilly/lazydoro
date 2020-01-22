@@ -23,9 +23,20 @@ class Schedule():
 
 
 class Clock(ABC):
+    INCREMENT = 1.0 / Schedule.SCALE
+
+    def __init__(self):
+        self._time = 0.0
+
+    def advance(self):
+        self._time += self.INCREMENT
+
     @abstractmethod
     def tick(self) -> bool:
         pass
+
+    def time(self) -> float:
+        return self._time
 
 
 class ToFSensor(ABC):
@@ -201,14 +212,24 @@ class PomodoroTimer:
         state = Waiting(schedule)
         self.led.set_display(Display.blue(0.0))
         while self.clock.tick():
+            old_state = state
             (state, buzzing, color) = state.update(self.person_there())
-            if verbosity > 0:
-                print(state.name())
+            self.monitor(old_state, state, verbosity)
             if buzzing:
                 self.buzzer.buzz()
             self.led.set_display(color)
-            if verbosity > 1:
-                print(self.tof_sensor.distance())
+            self.monitor_distance(verbosity)
+
+    def monitor_distance(self, verbosity):
+        if verbosity > 1:
+            print(self.tof_sensor.distance())
+
+    def monitor(self, old_state, state, verbosity):
+        if verbosity > 1:
+            print(state.name())
+        else:
+            if verbosity > 0 and state != old_state:
+                print('at %d %s -> %s' % (self.clock.time(), old_state.name(), state.name()))
 
     def distance(self):
         return self.tof_sensor.distance()

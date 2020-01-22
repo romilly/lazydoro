@@ -4,6 +4,13 @@ from lazydoro.pi.lazy_oo import Clock, Schedule
 
 
 class HatClock(Clock):
+    INCREMENT = 1.0 / Schedule.SCALE
+
+    def __init__(self):
+        Clock.__init__(self)
+
     def tick(self) -> bool:
-        sleep(1.0/ Schedule.SCALE)
+        self.advance()
+        sleep(self.INCREMENT)
         return True
+

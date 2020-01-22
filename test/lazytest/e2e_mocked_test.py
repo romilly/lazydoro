@@ -12,26 +12,29 @@ TIMEOUT = 3
 
 class MockClock(Clock):
     def __init__(self, limit=31*60):
+        Clock.__init__(self)
         self.limit = limit
-        self.count = 0
         self.last_event_at = 0
         self.assertions = defaultdict(list)
 
     def tick(self):
-        self.count += 1
-        if self.count in self.assertions:
-            for assertion in self.assertions[self.count]:
+        self.advance()
+        if self._time in self.assertions:
+            for assertion in self.assertions[self._time]:
                 try:
                     assertion() # run the relevant function
                 except Exception as e:
-                    print('at time %d' % self.count)
+                    print('at time %d' % (self._time / float(Schedule.SCALE)))
                     raise e
-        return self.count <= self.limit
+        return self.time() <= self.limit
 
     def after(self, time: int, *fns):
         next_event_at = time + self.last_event_at
         self.assertions[next_event_at]+=fns
         self.last_event_at = next_event_at
+
+    def time(self) -> float:
+        return self._time
 
 
 class MockTofSensor(ToFSensor):
@@ -89,8 +92,8 @@ class LazydoroTest(TestCase):
     def test_can_run_a_single_pomodoro(self):
         self.after(1, self.buzzer_is_quiet, self.led_is_blue) # initial state
         self.after(1, self.person_comes) # I sit down at my desk
-        self.after(5, self.buzzer_is_quiet, self.led_is_green)  # Pomodoro timer has started
-        self.after(DURATION-4, self.buzzer_is_quiet, self.led_is_green) # still running
+        self.after(3, self.buzzer_is_quiet, self.led_is_green)  # Pomodoro timer has started
+        self.after(DURATION-2, self.buzzer_is_quiet, self.led_is_green) # still running
         self.after(1, self.buzzer_is_buzzing, self.led_is_red) # timer has completed
         self.after(1, self.person_leaves) # I get up for a break
         self.after(1, self.buzzer_is_quiet, self.led_is_yellow) # timing a break
@@ -98,6 +101,7 @@ class LazydoroTest(TestCase):
         self.after(1, self.buzzer_is_buzzing, self.led_is_red) # timer has completed
         self.after(1, self.person_comes) # I sit down at my desk
         self.after(1, self.led_is_green) # next Pomodoro  has started
+        self.pom.run(self.schedule, verbosity=1)
 
     def test_pomodoro_stops_if_I_get_up_early(self):
         self.after(1, self.buzzer_is_quiet, self.led_is_blue)  # initial state
@@ -106,6 +110,7 @@ class LazydoroTest(TestCase):
         self.after(DURATION, self.buzzer_is_quiet, self.led_is_green)  # still running
         self.after(1, self.person_leaves) # I get up for a break
         self.after(1, self.buzzer_is_quiet, self.led_is_yellow) # timing a break
+        self.pom.run(self.schedule)
 
     def test_pomodoro_restarts_if_I_finish_break__early(self):
         self.after(1, self.person_comes)  # I sit down at my desk
