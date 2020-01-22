@@ -65,8 +65,9 @@ For now, you'll need to clone this repository into the directory of your choice 
     export PYTHONAPTH='.'
     python3 lazydoro/pi/lazy_zero.py
     
+#### Take care!
 
-
+The repository contains up-to-date code for the Raspberry Pi version, but the code for Adafruit feathers needs updating and may result in some changes to the Pi code to increase comatibility. Treat the code as beta quality at best, since the APIs may change!
 
 
 
