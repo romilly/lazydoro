@@ -1,10 +1,8 @@
 from collections import defaultdict
 from unittest import TestCase
-
 from hamcrest import assert_that, equal_to
 
-from src.lazydoro.pi.lazy_oo import Clock, ToFSensor, Buzzer, Schedule, Led, PomodoroTimer
-
+from src.lazydoro.pi.lazy_oo import Clock, ToFSensor, Buzzer, Schedule, Led, PomodoroTimer, Display
 
 DURATION = 10
 BREAK = 3
@@ -70,13 +68,13 @@ class MockBuzzer(Buzzer):
 
 class MockLed(Led):
     def __init__(self):
-        self._color = Led.OFF
+        self._display = Display(Display.OFF, 0)
 
-    def set_color(self, color):
-        self._color = color
+    def set_display(self, display):
+        self._display = display
 
-    def color(self):
-        return self._color
+    def display(self):
+        return self._display
 
 
 class LazydoroTest(TestCase):
@@ -127,16 +125,16 @@ class LazydoroTest(TestCase):
         assert_that(self.buzzer.buzzing,'buzzer is quiet but should be buzzing')
 
     def led_is_blue(self):
-        assert_that(self.led.color(), equal_to(Led.BLUE))
+        assert_that(self.led.color(), equal_to(Display.BLUE))
 
     def led_is_red(self):
-        assert_that(self.led.color(), equal_to(Led.RED))
+        assert_that(self.led.color(), equal_to(Display.RED))
 
     def led_is_green(self):
-        assert_that(self.led.color(), equal_to(Led.GREEN))
+        assert_that(self.led.color(), equal_to(Display.GREEN))
 
     def led_is_yellow(self):
-        assert_that(self.led.color(), equal_to(Led.YELLOW))
+        assert_that(self.led.color(), equal_to(Display.YELLOW))
 
     def person_comes(self):
         self.tof_sensor.person_comes()

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import namedtuple
 
 
 def average(values):
@@ -38,19 +39,50 @@ class Buzzer(ABC):
         pass
 
 
-class Led(ABC):
+class Display:
     RED = 'Red'
     GREEN = 'Green'
     BLUE = 'Blue'
     YELLOW = 'Yellow'
     OFF = 'Off'
+
+    def __init__(self, color: str, intensity: float = 0.0):
+        if color not in [self.RED, self.GREEN, self.BLUE, self.YELLOW, self.OFF]:
+            raise ValueError('% is not a valid color' % color)
+        self.color = color
+        self.intensity = intensity
+
+    @classmethod
+    def green(cls, intensity: float):
+        return Display(Display.GREEN, intensity)
+
+    @classmethod
+    def red(cls, intensity: float):
+        return Display(Display.RED, intensity)
+
+    @classmethod
+    def blue(cls, intensity: float):
+        return Display(Display.BLUE, intensity)
+
+    @classmethod
+    def yellow(cls, intensity: float):
+        return Display(Display.YELLOW, intensity)
+
+
+class Led(ABC):
     @abstractmethod
-    def set_color(self, color):
+    def set_display(self, color: Display):
         pass
 
     @abstractmethod
-    def color(self):
+    def display(self) -> Display:
         pass
+
+    def color(self) -> str:
+        return self.display().color
+
+    def intensity(self) -> float:
+        return self.display().intensity
 
 
 class State(ABC):
@@ -73,6 +105,9 @@ class State(ABC):
     def tick(self):
         self.ticks += 1
 
+    def stage(self):
+        return float(self.ticks) / self.duration
+
 
 class Resting(State):
     def __init__(self, schedule):
@@ -82,11 +117,11 @@ class Resting(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return Running(self.schedule), False, Led.GREEN
+            return Running(self.schedule), False, Display.green(self.stage())
         if self.due():
-            return Summoning(self.schedule), True, Led.RED
+            return Summoning(self.schedule), True, Display.red(self.stage())
         else:
-            return self, False, Led.YELLOW
+            return self, False, Display.yellow(self.stage())
 
     def name(self) -> str:
         return 'Resting'
@@ -100,12 +135,12 @@ class Running(State):
     def update(self, person_there) -> ('State', bool, str):
         self.tick()
         if not person_there:
-            return Resting(self.schedule), False, Led.YELLOW
+            return Resting(self.schedule), False, Display.yellow(self.stage())
         due = self.due()
         if due:
-            return self, True, Led.RED
+            return self, True, Display.red(self.stage())
         else:
-            return self, False, Led.GREEN
+            return self, False, Display.green(self.stage())
 
     def name(self) -> str:
         return 'Running'
@@ -114,13 +149,13 @@ class Running(State):
 class Waiting(State):
     def __init__(self, schedule):
         State.__init__(self, schedule)
-        self.duration = 0
+        self.duration = 1
 
     def update(self, person_there: bool):
         if person_there:
-            return Running(self.schedule), False, Led.GREEN
+            return Running(self.schedule), False, Display.green(self.stage())
         else:
-            return self, False, Led.BLUE
+            return self, False, Display.blue(self.stage())
 
     def name(self) -> str:
         return 'Waiting'
@@ -137,10 +172,10 @@ class Summoning(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return Running(self.schedule), False, Led.GREEN
+            return Running(self.schedule), False, Display.green(self.stage())
         if self.due():
-            return Waiting(self.schedule), False, Led.BLUE
-        return self, True, Led.YELLOW
+            return Waiting(self.schedule), False, Display.blue(self.stage())
+        return self, True, Display.yellow(self.stage())
 
 
 class PomodoroTimer:
@@ -163,14 +198,14 @@ class PomodoroTimer:
     def run(self, schedule: Schedule, units=60, verbosity=0):
         schedule.scale(units)
         state = Waiting(schedule)
-        self.led.set_color(Led.BLUE)
+        self.led.set_display(Display.blue(0.0))
         while self.clock.tick():
             (state, buzzing, color) = state.update(self.person_there())
             if verbosity > 0:
                 print(state.name())
             if buzzing:
                 self.buzzer.buzz()
-            self.led.set_color(color)
+            self.led.set_display(color)
             if verbosity > 1:
                 print(self.tof_sensor.distance())
 

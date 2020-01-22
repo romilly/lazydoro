@@ -21,10 +21,10 @@ class HatLEDs(Led):
     def __init__(self):
         self.color = Led.OFF
 
-    def color(self):
+    def display(self):
         return self.color()
 
-    def set_color(self, color):
+    def set_display(self, color):
         self.color = color
         eh.light.off()
         if color == Led.RED:

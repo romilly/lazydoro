@@ -68,10 +68,10 @@ class MockLed(Led):
     def __init__(self):
         self._color = Led.OFF
 
-    def set_color(self, color):
+    def set_display(self, color):
         self._color = color
 
-    def color(self):
+    def display(self):
         return self._color
 
 
@@ -125,16 +125,16 @@ class LazydoroTest(TestCase):
         assert_that(self.buzzer.buzzing,'buzzer is quiet but should be buzzing')
 
     def led_is_blue(self):
-        assert_that(self.led.color(), equal_to(Led.BLUE))
+        assert_that(self.led.display(), equal_to(Led.BLUE))
 
     def led_is_red(self):
-        assert_that(self.led.color(), equal_to(Led.RED))
+        assert_that(self.led.display(), equal_to(Led.RED))
 
     def led_is_green(self):
-        assert_that(self.led.color(), equal_to(Led.GREEN))
+        assert_that(self.led.display(), equal_to(Led.GREEN))
 
     def led_is_yellow(self):
-        assert_that(self.led.color(), equal_to(Led.YELLOW))
+        assert_that(self.led.display(), equal_to(Led.YELLOW))
 
     def person_comes(self):
         self.tof_sensor.person_comes()
