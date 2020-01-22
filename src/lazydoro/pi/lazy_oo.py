@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 
 
+def average(values):
+    return sum(values)/len(values)
+
+
 class Schedule():
     def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int):
         self.pomodoro_duration = pomodoro_duration
@@ -23,10 +27,6 @@ class Clock(ABC):
 
 
 class ToFSensor(ABC):
-    @abstractmethod
-    def is_someone_there(self):
-        pass
-
     @abstractmethod
     def distance(self)-> int:
         pass
@@ -144,11 +144,21 @@ class Summoning(State):
 
 
 class PomodoroTimer:
-    def __init__(self, clock: Clock, tof_sensor: ToFSensor, buzzer: Buzzer, led: Led):
+    WATCH_PERIOD = 5
+
+    def __init__(self, clock: Clock, tof_sensor: ToFSensor, buzzer: Buzzer, led: Led,
+                 threshold: int = 400):
         self.led = led
         self.buzzer = buzzer
         self.clock = clock
         self.tof_sensor = tof_sensor
+        self.threshold = threshold
+        self.presence = self.WATCH_PERIOD * [0]
+
+    def person_there(self):
+        self.presence = self.presence[1:] + [1 if self.distance() < self.threshold else 0]
+        count = sum(self.presence)
+        return count >= 0.5 * self.WATCH_PERIOD
 
     def run(self, schedule: Schedule, units=60, verbosity=0):
         schedule.scale(units)
@@ -164,8 +174,8 @@ class PomodoroTimer:
             if verbosity > 1:
                 print(self.tof_sensor.distance())
 
-    def person_there(self):
-        return self.tof_sensor.is_someone_there()
+    def distance(self):
+        return self.tof_sensor.distance()
 
 
 

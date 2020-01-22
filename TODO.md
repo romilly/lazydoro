@@ -1,5 +1,6 @@
 # TODO list
 
+1. ~~Improve *person present* code: check for majority vote, not average distance~~
 1. Add *intensity* code
 1. Make a video
 1. Add doc comments to code

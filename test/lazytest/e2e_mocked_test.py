@@ -37,20 +37,17 @@ class MockClock(Clock):
 
 
 class MockTofSensor(ToFSensor):
-    def distance(self) -> int:
-        return 0
-
     def __init__(self):
-        self._person_there = False
+        self._distance = 8190
+
+    def distance(self) -> int:
+        return self._distance
 
     def person_comes(self):
-        self._person_there = True
+        self._distance = 390
 
     def person_leaves(self):
-        self._person_there = False
-
-    def is_someone_there(self):
-        return self._person_there
+        self._distance = 8190
 
 
 class MockBuzzer(Buzzer):
@@ -94,8 +91,8 @@ class LazydoroTest(TestCase):
     def test_can_run_a_single_pomodoro(self):
         self.after(1, self.buzzer_is_quiet, self.led_is_blue) # initial state
         self.after(1, self.person_comes) # I sit down at my desk
-        self.after(1, self.buzzer_is_quiet, self.led_is_green)  # Pomodoro timer has started
-        self.after(DURATION, self.buzzer_is_quiet, self.led_is_green) # still running
+        self.after(5, self.buzzer_is_quiet, self.led_is_green)  # Pomodoro timer has started
+        self.after(DURATION-4, self.buzzer_is_quiet, self.led_is_green) # still running
         self.after(1, self.buzzer_is_buzzing, self.led_is_red) # timer has completed
         self.after(1, self.person_leaves) # I get up for a break
         self.after(1, self.buzzer_is_quiet, self.led_is_yellow) # timing a break
@@ -112,14 +109,12 @@ class LazydoroTest(TestCase):
         self.after(1, self.person_leaves) # I get up for a break
         self.after(1, self.buzzer_is_quiet, self.led_is_yellow) # timing a break
 
-
     def test_pomodoro_restarts_if_I_finish_break__early(self):
         self.after(1, self.person_comes)  # I sit down at my desk
         self.after(1, self.person_leaves)  # I get up for a break
-        self.after(1, self.buzzer_is_quiet, self.led_is_yellow)  # timing a break
+        self.after(10, self.buzzer_is_quiet, self.led_is_blue)  # timing a break
         self.after(1, self.person_comes)  # I sit down at my desk
-        self.after(1, self.buzzer_is_quiet, self.led_is_green)  # initial state
-
+        self.after(3, self.buzzer_is_quiet, self.led_is_green)  # initial state
         self.pom.run(self.schedule)
 
     def after(self, time: int, *fns):
