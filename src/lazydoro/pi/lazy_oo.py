@@ -8,6 +8,13 @@ class Schedule():
         self.grace_period = grace_period
         self.timeout = timeout
 
+    def scale(self, units):
+        if units != 1:
+            self.pomodoro_duration *= units
+            self.break_duration *= units
+            self.grace_period *= units
+            self.timeout *= units
+
 
 class Clock(ABC):
     @abstractmethod
@@ -29,6 +36,7 @@ class Buzzer(ABC):
     @abstractmethod
     def buzz(self):
         pass
+
 
 class Led(ABC):
     RED = 'Red'
@@ -136,22 +144,25 @@ class Summoning(State):
 
 
 class PomodoroTimer:
-    def __init__(self, clock: Clock, tof_sensor: ToFSensor, buzzer: Buzzer, led):
+    def __init__(self, clock: Clock, tof_sensor: ToFSensor, buzzer: Buzzer, led: Led):
         self.led = led
         self.buzzer = buzzer
         self.clock = clock
         self.tof_sensor = tof_sensor
 
-    def run(self, schedule: Schedule):
+    def run(self, schedule: Schedule, units=60, verbosity=0):
+        schedule.scale(units)
         state = Waiting(schedule)
         self.led.set_color(Led.BLUE)
         while self.clock.tick():
             (state, buzzing, color) = state.update(self.person_there())
-            print(state.name())
+            if verbosity > 0:
+                print(state.name())
             if buzzing:
                 self.buzzer.buzz()
             self.led.set_color(color)
-            print(self.tof_sensor.distance())
+            if verbosity > 1:
+                print(self.tof_sensor.distance())
 
     def person_there(self):
         return self.tof_sensor.is_someone_there()
