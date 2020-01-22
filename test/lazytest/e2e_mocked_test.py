@@ -110,13 +110,13 @@ class LazydoroTest(TestCase):
     def test_pomodoro_restarts_if_I_finish_break__early(self):
         self.after(1, self.person_comes)  # I sit down at my desk
         self.after(1, self.person_leaves)  # I get up for a break
-        self.after(10, self.buzzer_is_quiet, self.led_is_blue)  # timing a break
+        self.after(2, self.buzzer_is_quiet, self.led_is_yellow)  # timing a break
         self.after(1, self.person_comes)  # I sit down at my desk
         self.after(3, self.buzzer_is_quiet, self.led_is_green)  # initial state
         self.pom.run(self.schedule)
 
     def after(self, time: int, *fns):
-        self.clock.after(time, *fns)
+        self.clock.after(Schedule.SCALE * time, *fns)
 
     def buzzer_is_quiet(self):
         assert_that(not self.buzzer.buzzing,'buzzer is buzzing but should be quiet')

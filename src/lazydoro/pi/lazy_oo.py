@@ -7,11 +7,13 @@ def average(values):
 
 
 class Schedule():
+    SCALE = 10
     def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int):
         self.pomodoro_duration = pomodoro_duration
         self.break_duration = break_duration
         self.grace_period = grace_period
         self.timeout = timeout
+        self.scale(self.SCALE)
 
     def scale(self, units):
         if units != 1:
@@ -130,7 +132,7 @@ class Resting(State):
 class Running(State):
     def __init__(self, schedule):
         State.__init__(self, schedule)
-        self.duration =  schedule.pomodoro_duration
+        self.duration = schedule.pomodoro_duration
 
     def update(self, person_there) -> ('State', bool, str):
         self.tick()
