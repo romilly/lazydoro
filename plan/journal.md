@@ -62,3 +62,16 @@ I now have a working lazydoro with a Pi zero, a Pimoroni Blinkt! led array, a bu
 It uses an adafruit bonnet.
 
 ![lazy-zero](resources/images/lazydoro/lazy-zero-cropped.jpg)
+
+## Wednesday 22 January 2020
+
+Today I plan to extend the code to show how much of each time period has elapsed.
+
+I'll need to refactor.
+
+1. Encapsulate the Colour that's sent to a Led
+1. Add an *intensity* that goes from 1 to 8.
+1. For Blinkt!, use that as an offset along the strip of LEDs.
+
+When I get around to re-instating the feather version intensity will actually control the brightness of the LED.
+
