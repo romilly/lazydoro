@@ -6,15 +6,18 @@ def average(values):
 
 
 class Schedule():
-    SCALE = 10
-    def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int):
+    def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int, scale=10):
         self.pomodoro_duration = pomodoro_duration
         self.break_duration = break_duration
         self.grace_period = grace_period
         self.timeout = timeout
-        self.scale(self.SCALE)
+        self._scale = scale
+        self.rescale(scale)
 
-    def scale(self, units):
+    def scale(self):
+        return self._scale
+
+    def rescale(self, units):
         if units != 1:
             self.pomodoro_duration *= units
             self.break_duration *= units
@@ -23,20 +26,31 @@ class Schedule():
 
 
 class Clock(ABC):
-    INCREMENT = 1.0 / Schedule.SCALE
 
-    def __init__(self):
-        self._time = 0.0
+    def __init__(self, schedule: Schedule):
+        self._ticks = 0
+        scale = schedule.scale()
+        self._increment = 1.0 / scale
+        self._scale = scale
+
+    def scale(self):
+        return self._scale
 
     def advance(self):
-        self._time += self.INCREMENT
+        self._ticks += 1
+
+    def increment(self):
+        return self._increment
 
     @abstractmethod
     def tick(self) -> bool:
         pass
 
+    def ticks(self) -> int:
+        return self._ticks
+
     def time(self) -> float:
-        return self._time
+        return self.ticks() * self.increment()
 
 
 class ToFSensor(ABC):
@@ -46,9 +60,22 @@ class ToFSensor(ABC):
 
 
 class Buzzer(ABC):
-    @abstractmethod
-    def buzz(self):
-        pass
+    def on(self):
+        self.buzzing = True
+
+    def off(self):
+        self.buzzing = False
+
+    def __init__(self):
+        self.buzzing = False
+
+    def is_quiet(self):
+        return not self.is_buzzing()
+
+    def is_buzzing(self):
+        return self.buzzing
+
+
 
 
 class Display:
@@ -175,7 +202,7 @@ class Waiting(State):
 
 class Summoning(State):
     def name(self) -> str:
-        return 'Summoning'
+        return 'Alarming'
 
     def __init__(self, schedule):
         State.__init__(self, schedule)
@@ -207,18 +234,18 @@ class PomodoroTimer:
         count = sum(self.presence)
         return count >= 0.5 * self.WATCH_PERIOD
 
-    def run(self, schedule: Schedule, units=60, verbosity=0):
-        schedule.scale(units)
+    def run(self, schedule: Schedule, verbosity=0):
         state = Waiting(schedule)
         self.led.set_display(Display.blue(0.0))
         while self.clock.tick():
             old_state = state
             (state, buzzing, color) = state.update(self.person_there())
-            self.monitor(old_state, state, verbosity)
             if buzzing:
-                self.buzzer.buzz()
+                self.buzzer.on()
+            else:
+                self.buzzer.off()
             self.led.set_display(color)
-            self.monitor_distance(verbosity)
+            self.monitor(old_state, state, verbosity)
 
     def monitor_distance(self, verbosity):
         if verbosity > 1:
@@ -226,10 +253,13 @@ class PomodoroTimer:
 
     def monitor(self, old_state, state, verbosity):
         if verbosity > 1:
-            print(state.name())
+            print(self.clock.time(), state.name(), self.tof_sensor.distance(), self.sound(), self.led.color())
         else:
             if verbosity > 0 and state != old_state:
                 print('at %d %s -> %s' % (self.clock.time(), old_state.name(), state.name()))
+
+    def sound(self):
+        return 'buzzing' if self.buzzer.is_buzzing() else 'quiet'
 
     def distance(self):
         return self.tof_sensor.distance()

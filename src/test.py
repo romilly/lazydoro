@@ -9,7 +9,7 @@ class PwmBuzzer(Buzzer):
         GPIO.setup(pin, GPIO.OUT)
         self.buzzer = GPIO.PWM(pin, 400)
 
-    def buzz(self, status):
+    def on(self, status):
         self.beep(1, 400)
 
     def beep(self, seconds, freq):

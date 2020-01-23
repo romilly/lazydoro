@@ -51,7 +51,7 @@ class MockTofSensor(ToFSensor):
 
 
 class MockBuzzer(Buzzer):
-    def buzz(self, status: bool):
+    def on(self, status: bool):
         self.buzzing = status
 
     def __init__(self):

@@ -5,15 +5,16 @@ from time import sleep
 
 class PwmBuzzer(Buzzer):
     def __init__(self, pin=19):
+        Buzzer.__init__(self)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
         self.buzzer = GPIO.PWM(pin, 400)
 
-    def buzz(self):
-        self.beep(1, 400)
-
-    def beep(self, seconds, freq):
-        self.buzzer.ChangeFrequency(freq)
+    def on(self):
+        Buzzer.on()
+        self.buzzer.ChangeFrequency(400)
         self.buzzer.start(50)
-        sleep(seconds)
+
+    def off(self):
+        Buzzer.off()
         self.buzzer.stop()
