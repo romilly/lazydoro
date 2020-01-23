@@ -1,6 +1,6 @@
 from time import sleep
 
-from lazydoro.pi.lazy_oo import Clock, Schedule
+from lazydoro.pi.lazy_oo import Clock
 
 
 class HatClock(Clock):
@@ -10,6 +10,6 @@ class HatClock(Clock):
 
     def tick(self) -> bool:
         self.advance()
-        sleep(self.increment())
+        sleep(1)
         return True
 
