@@ -5,8 +5,8 @@ from lazydoro.pi.lazy_oo import Clock, Schedule
 
 class HatClock(Clock):
 
-    def __init__(self, schedule: Schedule):
-        Clock.__init__(self, schedule)
+    def __init__(self):
+        Clock.__init__(self)
 
     def tick(self) -> bool:
         self.advance()

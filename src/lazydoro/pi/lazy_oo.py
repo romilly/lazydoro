@@ -6,16 +6,11 @@ def average(values):
 
 
 class Schedule():
-    def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int, scale=10):
+    def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int):
         self.pomodoro_duration = pomodoro_duration
         self.break_duration = break_duration
         self.grace_period = grace_period
         self.timeout = timeout
-        self._scale = scale
-        self.rescale(scale)
-
-    def scale(self):
-        return self._scale
 
     def rescale(self, units):
         if units != 1:
@@ -27,20 +22,11 @@ class Schedule():
 
 class Clock(ABC):
 
-    def __init__(self, schedule: Schedule):
+    def __init__(self, ):
         self._ticks = 0
-        scale = schedule.scale()
-        self._increment = 1.0 / scale
-        self._scale = scale
-
-    def scale(self):
-        return self._scale
 
     def advance(self):
         self._ticks += 1
-
-    def increment(self):
-        return self._increment
 
     @abstractmethod
     def tick(self) -> bool:
@@ -48,9 +34,6 @@ class Clock(ABC):
 
     def ticks(self) -> int:
         return self._ticks
-
-    def time(self) -> float:
-        return self.ticks() * self.increment()
 
 
 class ToFSensor(ABC):
@@ -253,10 +236,10 @@ class PomodoroTimer:
 
     def monitor(self, old_state, state, verbosity):
         if verbosity > 1:
-            print(self.clock.time(), state.name(), self.tof_sensor.distance(), self.sound(), self.led.color())
+            print(self.clock.ticks(), state.name(), self.tof_sensor.distance(), self.sound(), self.led.color())
         else:
             if verbosity > 0 and state != old_state:
-                print('at %d %s -> %s' % (self.clock.time(), old_state.name(), state.name()))
+                print('at %d %s -> %s' % (self.clock.ticks(), old_state.name(), state.name()))
 
     def sound(self):
         return 'buzzing' if self.buzzer.is_buzzing() else 'quiet'
