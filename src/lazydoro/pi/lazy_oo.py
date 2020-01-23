@@ -59,8 +59,6 @@ class Buzzer(ABC):
         return self.buzzing
 
 
-
-
 class Display:
     RED = 'Red'
     GREEN = 'Green'
@@ -154,18 +152,32 @@ class Running(State):
         State.__init__(self, schedule)
         self.duration = schedule.pomodoro_duration
 
-    def update(self, person_there) -> ('State', bool, str):
+    def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if not person_there:
-            return Resting(self.schedule), False, Display.yellow(self.stage())
+            return Waiting(self.schedule), False, Display.blue(0)
         due = self.due()
         if due:
-            return self, True, Display.red(self.stage())
+            return TimeForABreak(self.schedule), True, Display.red(0)
         else:
             return self, False, Display.green(self.stage())
 
     def name(self) -> str:
         return 'Running'
+
+
+class TimeForABreak(State):
+    def __init__(self, schedule):
+        State.__init__(self, schedule)
+        self.duration = 1
+
+    def update(self, person_there: bool) -> ('State', bool, str):
+        if not person_there:
+            return Resting(self.schedule), False, Display.yellow(0)
+        return self, True, Display.red(self.stage())
+
+    def name(self) -> str:
+        return 'Time for a break'
 
 
 class Waiting(State):
@@ -175,7 +187,7 @@ class Waiting(State):
 
     def update(self, person_there: bool):
         if person_there:
-            return Running(self.schedule), False, Display.green(self.stage())
+            return Running(self.schedule), False, Display.green(0)
         else:
             return self, False, Display.blue(self.stage())
 
@@ -194,9 +206,9 @@ class Summoning(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return Running(self.schedule), False, Display.green(self.stage())
+            return Running(self.schedule), False, Display.green(0)
         if self.due():
-            return Waiting(self.schedule), False, Display.blue(self.stage())
+            return Waiting(self.schedule), False, Display.blue(0)
         return self, True, Display.yellow(self.stage())
 
 

@@ -85,41 +85,35 @@ class LazydoroTest(TestCase):
         self.clock = MockClock(self.schedule)
         self.pom = PomodoroTimer(self.clock, self.tof_sensor, self.buzzer, self.led)
 
-    # def test_can_run_a_single_pomodoro(self):
-    #     self.after(1, 'initial state', self.buzzer_is_quiet, self.led_is_blue)
-    #     self.after(1, 'I sit down', self.person_comes)
-    #     self.after(3, 'Pomodoro timer has started', self.buzzer_is_quiet, self.led_is_green)
-    #     self.after(DURATION, 'still running', self.buzzer_is_quiet, self.led_is_green)
-    #     self.after(1, 'timer has completed', self.buzzer_is_buzzing, self.led_is_red)
-    #     self.after(1, 'I get up for a break', self.person_leaves)
-    #     self.after(3, 'starting a break', self.buzzer_is_quiet, self.led_is_yellow)
-    #     self.after(BREAK-1, 'still on a break', self.buzzer_is_quiet, self.led_is_yellow)
-    #     self.after(2, 'break timer has completed', self.buzzer_is_buzzing, self.led_is_red)
-    #     self.after(1, 'I sit down again', self.person_comes)
-    #     self.after(3, 'next Pomodoro starts', self.led_is_green)
-    #     self.after(1, 'stopping', self.stop)
-    #     self.pom.run(self.schedule, verbosity=2)
-    #     self.clock.check()
+    def test_can_run_a_single_pomodoro(self):
+        self.after(1, 'initial state', self.buzzer_is_quiet, self.led_is_blue)
+        self.after(1, 'I sit down', self.person_comes)
+        self.after(3, 'Pomodoro timer has started', self.buzzer_is_quiet, self.led_is_green)
+        self.after(DURATION, 'still running', self.buzzer_is_quiet, self.led_is_green)
+        self.after(1, 'timer has completed', self.buzzer_is_buzzing, self.led_is_red)
+        self.after(1, 'I get up for a break', self.person_leaves)
+        self.after(3, 'starting a break', self.buzzer_is_quiet, self.led_is_yellow)
+        self.after(BREAK-1, 'still on a break', self.buzzer_is_quiet, self.led_is_yellow)
+        self.after(2, 'break timer has completed', self.buzzer_is_buzzing, self.led_is_red)
+        self.after(1, 'I sit down again', self.person_comes)
+        self.after(3, 'next Pomodoro starts', self.led_is_green)
+        self.after(1, 'stopping', self.stop)
+        self.pom.run(self.schedule, verbosity=2)
+        self.clock.check()
 
     def test_pomodoro_stops_if_I_get_up_early(self):
-        self.after(1, 'initial state', self.buzzer_is_quiet, self.led_is_blue)  # initial state
-        self.after(1, 'I sit down at my desk', self.person_comes)  # I sit down at my desk
-        self.after(5, 'Pomodoro timer has started', self.led_is_green) # Pomodoro timer has started
-        self.after(DURATION-5, 'still running', self.buzzer_is_quiet, self.led_is_green)  # still running
-        self.after(1,'I get up early',  self.person_leaves) # I get up early
-        self.after(3, 'timing a break', self.buzzer_is_quiet, self.led_is_red) # timing a break
+        self.after(1, 'initial state', self.buzzer_is_quiet, self.led_is_blue)
+        self.after(1, 'I sit down at my desk', self.person_comes)
+        self.after(5, 'Pomodoro timer has started', self.led_is_green)
+        self.after(DURATION-5, 'still running', self.buzzer_is_quiet, self.led_is_green)
+        self.after(1,'I get up early',  self.person_leaves)
+        self.after(3, 'waiting', self.buzzer_is_quiet, self.led_is_blue)
         self.after(1, 'stopping', self.stop)
         self.pom.run(self.schedule, verbosity=2)
         self.clock.stop()
         self.clock.check()
 
-    # def test_pomodoro_restarts_if_I_finish_break__early(self):
-    #     self.after(1, self.person_comes)  # I sit down at my desk
-    #     self.after(1, self.person_leaves)  # I get up for a break
-    #     self.after(2, self.buzzer_is_quiet, self.led_is_yellow)  # timing a break
-    #     self.after(1, self.person_comes)  # I sit down at my desk
-    #     self.after(3, self.buzzer_is_quiet, self.led_is_green)  # initial state
-    #     self.pom.run(self.schedule)
+
 
     def after(self, time: int, *fns):
         self.clock.after(time, *fns)
