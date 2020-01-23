@@ -12,8 +12,8 @@ if __name__ == '__main__':
     time_units = 60 if len(sys.argv) < 2 else 1 # to run a demo, just append 'demo' after the script name
     tof_sensor = VL53L0XToF()
     schedule = Schedule(20, 5, 3, 3)
-    clock = HatClock()
+    clock = HatClock(schedule)
     buzzer = PwmBuzzer(pin=6)
     led = BlinktLEDs()
     pom = PomodoroTimer(clock, tof_sensor, buzzer, led)
-    pom.run(schedule, units=time_units)
+    pom.run(schedule)
