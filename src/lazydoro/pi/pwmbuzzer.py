@@ -11,10 +11,10 @@ class PwmBuzzer(Buzzer):
         self.buzzer = GPIO.PWM(pin, 400)
 
     def on(self):
-        Buzzer.on()
+        Buzzer.on(self)
         self.buzzer.ChangeFrequency(400)
         self.buzzer.start(50)
 
     def off(self):
-        Buzzer.off()
+        Buzzer.off(self)
         self.buzzer.stop()
