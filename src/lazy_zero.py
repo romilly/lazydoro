@@ -15,5 +15,5 @@ if __name__ == '__main__':
     clock = HatClock()
     buzzer = PwmBuzzer(pin=6)
     led = BlinktLEDs()
-    pom = PomodoroTimer(clock, tof_sensor, buzzer, led)
+    pom = PomodoroTimer(clock, tof_sensor, buzzer, led, schedule)
     pom.run(schedule)

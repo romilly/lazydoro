@@ -14,17 +14,20 @@ class Schedule:
 
 
 class Clock(ABC):
-    def __init__(self, ):
-        self._ticks = 0
+    TICKS_PER_SECOND = 8
+    TICK_DURATION = 1.0 / TICKS_PER_SECOND
 
-    def advance(self):
-        self._ticks += 1
+    def __init__(self, ):
+        self._ticks = 0.0
 
     @abstractmethod
-    def tick(self) -> bool:
+    def running(self):
         pass
 
-    def ticks(self) -> int:
+    def tick(self) -> None:
+        self._ticks += 1
+
+    def ticks(self) -> float:
         return self._ticks
 
 
@@ -110,11 +113,16 @@ class State(ABC):
         cls._substates[state.name()] = state
 
     @classmethod
-    def state_named(cls, name: str):
-        return cls._substates[name]
+    def new_state(cls, name: str):
+        next_state = cls._substates[name]
+        next_state.reset()
+        return next_state
 
     def due(self):
-        return self.ticks > self.duration
+        return self.time() > self.duration
+
+    def reset(self):
+        self.ticks = 0
 
     @abstractmethod
     def update(self, person_there: bool) -> ('State', bool, str):
@@ -124,7 +132,10 @@ class State(ABC):
         self.ticks += 1
 
     def stage(self):
-        return float(self.ticks) / self.duration
+        return (self.time()) / self.duration
+
+    def time(self):
+        return self.ticks * Clock.TICK_DURATION
 
     def name(self) -> str:
         return type(self).__name__
@@ -134,9 +145,9 @@ class Resting(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return self.state_named('Running'), False, Display.green(self.stage())
+            return self.new_state('Running'), False, Display.green(self.stage())
         if self.due():
-            return self.state_named('Alarming'), True, Display.red(self.stage())
+            return self.new_state('Alarming'), True, Display.red(self.stage())
         else:
             return self, False, Display.yellow(self.stage())
 
@@ -148,10 +159,10 @@ class Running(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if not person_there:
-            return self.state_named('Waiting'), False, Display.blue(0)
+            return self.new_state('Waiting'), False, Display.blue(0)
         due = self.due()
         if due:
-            return self.state_named('TimeForABreak'), True, Display.red(0)
+            return self.new_state('TimeForABreak'), True, Display.red(0)
         else:
             return self, False, Display.green(self.stage())
 
@@ -163,7 +174,7 @@ class TimeForABreak(State):
 
     def update(self, person_there: bool) -> ('State', bool, str):
         if not person_there:
-            return self.state_named('Resting'), False, Display.yellow(0)
+            return self.new_state('Resting'), False, Display.yellow(0)
         return self, True, Display.red(self.stage())
 
 
@@ -173,7 +184,7 @@ class Waiting(State):
 
     def update(self, person_there: bool):
         if person_there:
-            return self.state_named('Running'), False, Display.green(0)
+            return self.new_state('Running'), False, Display.green(0)
         else:
             return self, False, Display.blue(self.stage())
 
@@ -185,9 +196,9 @@ class Alarming(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return self.state_named('Running'), False, Display.green(0)
+            return self.new_state('Running'), False, Display.green(0)
         if self.due():
-            return self.state_named('Waiting'), False, Display.blue(0)
+            return self.new_state('Waiting'), False, Display.blue(0)
         return self, True, Display.yellow(self.stage())
 
 
@@ -207,7 +218,7 @@ class PomodoroTimer:
         State.add_state(Resting(clock, schedule.break_duration))
         State.add_state(Alarming(clock, schedule.timeout))
         State.add_state(TimeForABreak(clock, schedule.grace_period))
-        self.state = State.state_named('Waiting')
+        self.state = State.new_state('Waiting')
 
     def person_there(self):
         self.presence = self.presence[1:] + [1 if self.distance() < self.threshold else 0]

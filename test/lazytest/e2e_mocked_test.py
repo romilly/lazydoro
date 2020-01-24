@@ -22,7 +22,7 @@ class MockClock(Clock):
         self._running = True
 
     def tick(self):
-        self.advance()
+        Clock.tick(self)
         if self._ticks in self.assertions:
             for assertion in self.assertions[self._ticks]:
                 try:
@@ -31,10 +31,12 @@ class MockClock(Clock):
                 except Exception as e:
                     print('at time %d assertion %s failed' % (self.ticks(), self.descriptions[self._ticks]), file=sys.stderr)
                     self._failures = True
+
+    def running(self):
         return self.ticks() <= self.limit and self._running
 
-    def after(self, interval: int, description: str, *fns):
-        next_event_at = interval + self.last_event_at
+    def after(self, seconds: int, description: str, *fns):
+        next_event_at = (seconds * self.TICKS_PER_SECOND) + self.last_event_at
         self.assertions[next_event_at]+=fns
         self.descriptions[next_event_at] = description
         self.last_event_at = next_event_at
