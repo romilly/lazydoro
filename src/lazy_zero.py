@@ -16,4 +16,4 @@ if __name__ == '__main__':
     buzzer = PwmBuzzer(pin=6)
     led = BlinktLEDs()
     pom = PomodoroTimer(clock, tof_sensor, buzzer, led, schedule)
-    pom.run(schedule)
+    pom.run()

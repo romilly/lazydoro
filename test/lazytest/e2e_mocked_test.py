@@ -116,8 +116,6 @@ class LazydoroTest(TestCase):
         self.clock.stop()
         self.clock.check()
 
-
-
     def after(self, time: int, *fns):
         self.clock.after(time, *fns)
 

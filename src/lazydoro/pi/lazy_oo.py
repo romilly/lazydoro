@@ -237,10 +237,6 @@ class PomodoroTimer:
             self.led.set_display(color)
             self.monitor(old_state, verbosity)
 
-    def monitor_distance(self, verbosity):
-        if verbosity > 1:
-            print(self.tof_sensor.distance())
-
     def monitor(self, old_state, verbosity):
         if verbosity > 1:
             print(self.clock.ticks(), self.state.name(), self.tof_sensor.distance(), self.sound(), self.led.color())
