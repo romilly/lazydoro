@@ -170,7 +170,6 @@ class Running(State):
 class TimeForABreak(State):
     def __init__(self, clock, duration):
         State.__init__(self, clock, duration)
-        self.duration = 1
 
     def update(self, person_there: bool) -> ('State', bool, str):
         if not person_there:
@@ -199,7 +198,7 @@ class Alarming(State):
             return self.new_state('Running'), False, Display.green(0)
         if self.due():
             return self.new_state('Waiting'), False, Display.blue(0)
-        return self, True, Display.yellow(self.stage())
+        return self, True, Display.red(self.stage())
 
 
 class PomodoroTimer:
@@ -227,7 +226,8 @@ class PomodoroTimer:
 
     def run(self, verbosity=0):
         self.led.set_display(Display.blue(0.0))
-        while self.clock.tick():
+        while self.clock.running():
+            self.clock.tick()
             old_state = self.state
             (self.state, buzzing, color) = self.state.update(self.person_there())
             if buzzing:

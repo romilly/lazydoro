@@ -27,10 +27,11 @@ class MockClock(Clock):
             for assertion in self.assertions[self._ticks]:
                 try:
                     assertion() # run the relevant function
-                    print(self.ticks(), self.descriptions[self._ticks], 'OK')
                 except Exception as e:
                     print('at time %d assertion %s failed' % (self.ticks(), self.descriptions[self._ticks]), file=sys.stderr)
                     self._failures = True
+                    continue
+            print(self.ticks(), self.descriptions[self._ticks], 'OK')
 
     def running(self):
         return self.ticks() <= self.limit and self._running
@@ -90,28 +91,28 @@ class LazydoroTest(TestCase):
     def test_can_run_a_single_pomodoro(self):
         self.after(1, 'initial state', self.buzzer_is_quiet, self.led_is_blue)
         self.after(1, 'I sit down', self.person_comes)
-        self.after(3, 'Pomodoro timer has started', self.buzzer_is_quiet, self.led_is_green)
-        self.after(DURATION, 'still running', self.buzzer_is_quiet, self.led_is_green)
+        self.after(1, 'Pomodoro timer has started', self.buzzer_is_quiet, self.led_is_green)
+        self.after(DURATION-1, 'still running', self.buzzer_is_quiet, self.led_is_green)
         self.after(1, 'timer has completed', self.buzzer_is_buzzing, self.led_is_red)
         self.after(1, 'I get up for a break', self.person_leaves)
-        self.after(3, 'starting a break', self.buzzer_is_quiet, self.led_is_yellow)
-        self.after(BREAK-1, 'still on a break', self.buzzer_is_quiet, self.led_is_yellow)
-        self.after(2, 'break timer has completed', self.buzzer_is_buzzing, self.led_is_red)
+        self.after(1, 'starting a break', self.buzzer_is_quiet, self.led_is_yellow)
+        self.after(BREAK-3, 'still on a break', self.buzzer_is_quiet, self.led_is_yellow)
+        self.after(3, 'break timer has completed', self.buzzer_is_buzzing, self.led_is_red)
         self.after(1, 'I sit down again', self.person_comes)
         self.after(3, 'next Pomodoro starts', self.led_is_green)
         self.after(1, 'stopping', self.stop)
-        self.pom.run(verbosity=2)
+        self.pom.run()
         self.clock.check()
 
     def test_pomodoro_stops_if_I_get_up_early(self):
         self.after(1, 'initial state', self.buzzer_is_quiet, self.led_is_blue)
         self.after(1, 'I sit down at my desk', self.person_comes)
-        self.after(5, 'Pomodoro timer has started', self.led_is_green)
+        self.after(1, 'Pomodoro timer has started', self.led_is_green)
         self.after(DURATION-5, 'still running', self.buzzer_is_quiet, self.led_is_green)
         self.after(1,'I get up early',  self.person_leaves)
         self.after(3, 'waiting', self.buzzer_is_quiet, self.led_is_blue)
         self.after(1, 'stopping', self.stop)
-        self.pom.run(verbosity=2)
+        self.pom.run()
         self.clock.stop()
         self.clock.check()
 
