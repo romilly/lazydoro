@@ -81,9 +81,9 @@ class LazydoroTest(TestCase):
         self.tof_sensor = MockTofSensor()
         self.buzzer = MockBuzzer()
         self.led = MockLed()
-        self.schedule = Schedule(DURATION, BREAK, GRACE, TIMEOUT)
-        self.clock = MockClock(self.schedule)
-        self.pom = PomodoroTimer(self.clock, self.tof_sensor, self.buzzer, self.led)
+        schedule = Schedule(DURATION, BREAK, GRACE, TIMEOUT)
+        self.clock = MockClock(schedule)
+        self.pom = PomodoroTimer(self.clock, self.tof_sensor, self.buzzer, self.led, schedule)
 
     def test_can_run_a_single_pomodoro(self):
         self.after(1, 'initial state', self.buzzer_is_quiet, self.led_is_blue)
@@ -98,7 +98,7 @@ class LazydoroTest(TestCase):
         self.after(1, 'I sit down again', self.person_comes)
         self.after(3, 'next Pomodoro starts', self.led_is_green)
         self.after(1, 'stopping', self.stop)
-        self.pom.run(self.schedule, verbosity=2)
+        self.pom.run(verbosity=2)
         self.clock.check()
 
     def test_pomodoro_stops_if_I_get_up_early(self):
@@ -109,7 +109,7 @@ class LazydoroTest(TestCase):
         self.after(1,'I get up early',  self.person_leaves)
         self.after(3, 'waiting', self.buzzer_is_quiet, self.led_is_blue)
         self.after(1, 'stopping', self.stop)
-        self.pom.run(self.schedule, verbosity=2)
+        self.pom.run(verbosity=2)
         self.clock.stop()
         self.clock.check()
 

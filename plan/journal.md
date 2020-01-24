@@ -59,7 +59,7 @@ Lots of work not captured in the journal.
 
 I now have a working lazydoro with a Pi zero, a Pimoroni Blinkt! led array, a buzzer and an adafruit VL53L0X sensor.
 
-It uses an adafruit bonnet.
+It uses an Adafruit bonnet.
 
 ![lazy-zero](resources/images/lazydoro/lazy-zero-cropped.jpg)
 
@@ -75,3 +75,9 @@ I'll need to refactor.
 
 When I get around to re-instating the feather version intensity will actually control the brightness of the LED.
 
+
+## Friday 24 January 2020
+
+Lots of progress yesterday. Lazydoro works quite well but I need to simplify the tests and I can now see how to :)
+
+Once that's done I have a couple of minor usability changes to make.

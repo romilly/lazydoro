@@ -5,23 +5,15 @@ def average(values):
     return sum(values)/len(values)
 
 
-class Schedule():
+class Schedule:
     def __init__(self, pomodoro_duration: int, break_duration: int, grace_period: int, timeout: int):
         self.pomodoro_duration = pomodoro_duration
         self.break_duration = break_duration
         self.grace_period = grace_period
         self.timeout = timeout
 
-    def rescale(self, units):
-        if units != 1:
-            self.pomodoro_duration *= units
-            self.break_duration *= units
-            self.grace_period *= units
-            self.timeout *= units
-
 
 class Clock(ABC):
-
     def __init__(self, ):
         self._ticks = 0
 
@@ -106,10 +98,20 @@ class Led(ABC):
 
 
 class State(ABC):
-    def __init__(self, schedule: Schedule):
-        self.schedule = schedule
+    _substates = {}
+
+    def __init__(self, clock: Clock, duration: int):
+        self.clock = clock
+        self.duration = duration
         self.ticks = 0
-        self.duration = 0
+
+    @classmethod
+    def add_state(cls, state: 'State'):
+        cls._substates[state.name()] = state
+
+    @classmethod
+    def state_named(cls, name: str):
+        return cls._substates[name]
 
     def due(self):
         return self.ticks > self.duration
@@ -118,97 +120,74 @@ class State(ABC):
     def update(self, person_there: bool) -> ('State', bool, str):
         pass
 
-    @abstractmethod
-    def name(self) -> str:
-        pass
-
     def tick(self):
         self.ticks += 1
 
     def stage(self):
         return float(self.ticks) / self.duration
 
+    def name(self) -> str:
+        return type(self).__name__
+
 
 class Resting(State):
-    def __init__(self, schedule):
-        State.__init__(self, schedule)
-        self.duration = schedule.break_duration
-
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return Running(self.schedule), False, Display.green(self.stage())
+            return self.state_named('Running'), False, Display.green(self.stage())
         if self.due():
-            return Summoning(self.schedule), True, Display.red(self.stage())
+            return self.state_named('Alarming'), True, Display.red(self.stage())
         else:
             return self, False, Display.yellow(self.stage())
 
-    def name(self) -> str:
-        return 'Resting'
-
 
 class Running(State):
-    def __init__(self, schedule):
-        State.__init__(self, schedule)
-        self.duration = schedule.pomodoro_duration
+    def __init__(self, clock, duration):
+        State.__init__(self, clock, duration)
 
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if not person_there:
-            return Waiting(self.schedule), False, Display.blue(0)
+            return self.state_named('Waiting'), False, Display.blue(0)
         due = self.due()
         if due:
-            return TimeForABreak(self.schedule), True, Display.red(0)
+            return self.state_named('TimeForABreak'), True, Display.red(0)
         else:
             return self, False, Display.green(self.stage())
 
-    def name(self) -> str:
-        return 'Running'
-
 
 class TimeForABreak(State):
-    def __init__(self, schedule):
-        State.__init__(self, schedule)
+    def __init__(self, clock, duration):
+        State.__init__(self, clock, duration)
         self.duration = 1
 
     def update(self, person_there: bool) -> ('State', bool, str):
         if not person_there:
-            return Resting(self.schedule), False, Display.yellow(0)
+            return self.state_named('Resting'), False, Display.yellow(0)
         return self, True, Display.red(self.stage())
-
-    def name(self) -> str:
-        return 'Time for a break'
 
 
 class Waiting(State):
-    def __init__(self, schedule):
-        State.__init__(self, schedule)
-        self.duration = 1
+    def __init__(self, clock, duration):
+        State.__init__(self, clock, duration)
 
     def update(self, person_there: bool):
         if person_there:
-            return Running(self.schedule), False, Display.green(0)
+            return self.state_named('Running'), False, Display.green(0)
         else:
             return self, False, Display.blue(self.stage())
 
-    def name(self) -> str:
-        return 'Waiting'
 
-
-class Summoning(State):
-    def name(self) -> str:
-        return 'Alarming'
-
-    def __init__(self, schedule):
-        State.__init__(self, schedule)
-        self.duration = schedule.timeout
+class Alarming(State):
+    def __init__(self, clock, duration):
+        State.__init__(self, clock, duration)
 
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return Running(self.schedule), False, Display.green(0)
+            return self.state_named('Running'), False, Display.green(0)
         if self.due():
-            return Waiting(self.schedule), False, Display.blue(0)
+            return self.state_named('Waiting'), False, Display.blue(0)
         return self, True, Display.yellow(self.stage())
 
 
@@ -216,42 +195,47 @@ class PomodoroTimer:
     WATCH_PERIOD = 5
 
     def __init__(self, clock: Clock, tof_sensor: ToFSensor, buzzer: Buzzer, led: Led,
-                 threshold: int = 400):
+                 schedule: Schedule, threshold: int = 400):
         self.led = led
         self.buzzer = buzzer
         self.clock = clock
         self.tof_sensor = tof_sensor
         self.threshold = threshold
         self.presence = self.WATCH_PERIOD * [0]
+        State.add_state(Waiting(clock, -1))
+        State.add_state(Running(clock, schedule.pomodoro_duration))
+        State.add_state(Resting(clock, schedule.break_duration))
+        State.add_state(Alarming(clock, schedule.timeout))
+        State.add_state(TimeForABreak(clock, schedule.grace_period))
+        self.state = State.state_named('Waiting')
 
     def person_there(self):
         self.presence = self.presence[1:] + [1 if self.distance() < self.threshold else 0]
         count = sum(self.presence)
         return count >= 0.5 * self.WATCH_PERIOD
 
-    def run(self, schedule: Schedule, verbosity=0):
-        state = Waiting(schedule)
+    def run(self, verbosity=0):
         self.led.set_display(Display.blue(0.0))
         while self.clock.tick():
-            old_state = state
-            (state, buzzing, color) = state.update(self.person_there())
+            old_state = self.state
+            (self.state, buzzing, color) = self.state.update(self.person_there())
             if buzzing:
                 self.buzzer.on()
             else:
                 self.buzzer.off()
             self.led.set_display(color)
-            self.monitor(old_state, state, verbosity)
+            self.monitor(old_state, verbosity)
 
     def monitor_distance(self, verbosity):
         if verbosity > 1:
             print(self.tof_sensor.distance())
 
-    def monitor(self, old_state, state, verbosity):
+    def monitor(self, old_state, verbosity):
         if verbosity > 1:
-            print(self.clock.ticks(), state.name(), self.tof_sensor.distance(), self.sound(), self.led.color())
+            print(self.clock.ticks(), self.state.name(), self.tof_sensor.distance(), self.sound(), self.led.color())
         else:
-            if verbosity > 0 and state != old_state:
-                print('at %d %s -> %s' % (self.clock.ticks(), old_state.name(), state.name()))
+            if verbosity == 1 and self.state != old_state:
+                print('at %d %s -> %s' % (self.clock.ticks(), old_state.name(), self.state.name()))
 
     def sound(self):
         return 'buzzing' if self.buzzer.is_buzzing() else 'quiet'
