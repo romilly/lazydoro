@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from time import sleep
 
 
 def average(values):
@@ -18,23 +19,45 @@ class Clock(ABC):
     TICK_DURATION = 1.0 / TICKS_PER_SECOND
 
     def __init__(self, ):
-        self._ticks = 0.0
+        self.ticks = 0
 
     @abstractmethod
     def running(self):
         pass
 
     def tick(self) -> None:
-        self._ticks += 1
+        self.ticks += 1
 
-    def ticks(self) -> float:
-        return self._ticks
+    def reset(self):
+        self.ticks = 0
 
 
 class ToFSensor(ABC):
     @abstractmethod
-    def distance(self)-> int:
+    def distance(self) -> int:
         pass
+
+
+class PersonDetector(ABC):
+    @abstractmethod
+    def is_person_present(self) -> bool:
+        pass
+
+
+class DistanceBasedDetector(PersonDetector):
+    def __init__(self, sensor: ToFSensor, threshold: int):
+        self.sensor = sensor
+        self.threshold = threshold
+        self.readings = 5
+        self.results = self.readings * [False]
+
+    def is_person_present(self) -> bool:
+        count = 0
+        for index in range(5):
+            if self.sensor.distance() < self.threshold:
+                count += 1
+            sleep(0.1)
+        return count > 0.5 * self.readings
 
 
 class Buzzer(ABC):
@@ -61,27 +84,31 @@ class Display:
     YELLOW = 'Yellow'
     OFF = 'Off'
 
-    def __init__(self, color: str, intensity: float = 0.0):
+    def __init__(self, color: str, current: int, limit: int):
         if color not in [self.RED, self.GREEN, self.BLUE, self.YELLOW, self.OFF]:
             raise ValueError('% is not a valid color' % color)
         self.color = color
-        self.intensity = intensity
+        self.current = current
+        self.limit = limit
 
     @classmethod
-    def green(cls, intensity: float):
-        return Display(Display.GREEN, intensity)
+    def green(cls, current:int, limit: int):
+        return Display(Display.GREEN, current, limit)
 
     @classmethod
-    def red(cls, intensity: float):
-        return Display(Display.RED, intensity)
+    def red(cls, current: int, limit: int):
+        return Display(Display.RED, current, limit)
 
     @classmethod
-    def blue(cls, intensity: float):
-        return Display(Display.BLUE, intensity)
+    def blue(cls, current: int, limit: int):
+        return Display(Display.BLUE, current, limit)
 
     @classmethod
-    def yellow(cls, intensity: float):
-        return Display(Display.YELLOW, intensity)
+    def yellow(cls, current: int, limit: int):
+        return Display(Display.YELLOW, current, limit)
+
+    def __str__(self):
+        return 'Display.%s(%d,%d)' % (self.color, self.current, self.limit)
 
 
 class Led(ABC):
@@ -96,16 +123,13 @@ class Led(ABC):
     def color(self) -> str:
         return self.display().color
 
-    def intensity(self) -> float:
-        return self.display().intensity
-
 
 class State(ABC):
     _substates = {}
 
-    def __init__(self, clock: Clock, duration: int):
+    def __init__(self, clock: Clock, duration_seconds: int):
         self.clock = clock
-        self.duration = duration
+        self.duration = duration_seconds * clock.TICKS_PER_SECOND
         self.ticks = 0
 
     @classmethod
@@ -119,7 +143,7 @@ class State(ABC):
         return next_state
 
     def due(self):
-        return self.time() > self.duration
+        return self.ticks > self.duration
 
     def reset(self):
         self.ticks = 0
@@ -130,9 +154,6 @@ class State(ABC):
 
     def tick(self):
         self.ticks += 1
-
-    def stage(self):
-        return (self.time()) / self.duration
 
     def time(self):
         return self.ticks * Clock.TICK_DURATION
@@ -145,11 +166,11 @@ class Resting(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return self.new_state('Running'), False, Display.green(self.stage())
+            return self.new_state('Running'), False, Display.green(self.ticks, self.duration)
         if self.due():
-            return self.new_state('Alarming'), True, Display.red(self.stage())
+            return self.new_state('Alarming'), True, Display.red(self.ticks, self.duration)
         else:
-            return self, False, Display.yellow(self.stage())
+            return self, False, Display.yellow(self.ticks, self.duration)
 
 
 class Running(State):
@@ -159,12 +180,12 @@ class Running(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if not person_there:
-            return self.new_state('Waiting'), False, Display.blue(0)
+            return self.new_state('Waiting'), False, Display.blue(0, 1)
         due = self.due()
         if due:
-            return self.new_state('TimeForABreak'), True, Display.red(0)
+            return self.new_state('TimeForABreak'), True, Display.red(0, 1)
         else:
-            return self, False, Display.green(self.stage())
+            return self, False, Display.green(self.ticks, self.duration)
 
 
 class TimeForABreak(State):
@@ -173,8 +194,8 @@ class TimeForABreak(State):
 
     def update(self, person_there: bool) -> ('State', bool, str):
         if not person_there:
-            return self.new_state('Resting'), False, Display.yellow(0)
-        return self, True, Display.red(self.stage())
+            return self.new_state('Resting'), False, Display.yellow(0, 1)
+        return self, True, Display.red(self.ticks, self.duration)
 
 
 class Waiting(State):
@@ -183,9 +204,9 @@ class Waiting(State):
 
     def update(self, person_there: bool):
         if person_there:
-            return self.new_state('Running'), False, Display.green(0)
+            return self.new_state('Running'), False, Display.green(0, 1)
         else:
-            return self, False, Display.blue(self.stage())
+            return self, False, Display.blue(self.ticks, self.duration)
 
 
 class Alarming(State):
@@ -195,37 +216,39 @@ class Alarming(State):
     def update(self, person_there: bool) -> ('State', bool, str):
         self.tick()
         if person_there:
-            return self.new_state('Running'), False, Display.green(0)
+            return self.new_state('Running'), False, Display.green(0, 1)
         if self.due():
-            return self.new_state('Waiting'), False, Display.blue(0)
-        return self, True, Display.red(self.stage())
+            return self.new_state('Waiting'), False, Display.blue(0, 1)
+        return self, True, Display.red(self.ticks, self.duration)
 
 
 class PomodoroTimer:
     WATCH_PERIOD = 5
 
-    def __init__(self, clock: Clock, tof_sensor: ToFSensor, buzzer: Buzzer, led: Led,
+    def __init__(self, clock: Clock, detector: PersonDetector, buzzer: Buzzer, led: Led,
                  schedule: Schedule, threshold: int = 400):
         self.led = led
         self.buzzer = buzzer
         self.clock = clock
-        self.tof_sensor = tof_sensor
+        self.detector = detector
         self.threshold = threshold
         self.presence = self.WATCH_PERIOD * [0]
-        State.add_state(Waiting(clock, -1))
+        State.add_state(Waiting(clock, 1))
         State.add_state(Running(clock, schedule.pomodoro_duration))
         State.add_state(Resting(clock, schedule.break_duration))
         State.add_state(Alarming(clock, schedule.timeout))
         State.add_state(TimeForABreak(clock, schedule.grace_period))
         self.state = State.new_state('Waiting')
+        self.led.set_display(Display.blue(0, 1))
 
-    def person_there(self):
-        self.presence = self.presence[1:] + [1 if self.distance() < self.threshold else 0]
-        count = sum(self.presence)
-        return count >= 0.5 * self.WATCH_PERIOD
+    def person_there(self) -> bool:
+        return self.detector.is_person_present()
+        # self.presence = self.presence[1:] + [1 if self.distance() < self.threshold else 0]
+        # count = sum(self.presence)
+        # return count >= 0.5 * self.WATCH_PERIOD
+
 
     def run(self, verbosity=0):
-        self.led.set_display(Display.blue(0.0))
         while self.clock.running():
             self.clock.tick()
             old_state = self.state
@@ -239,16 +262,13 @@ class PomodoroTimer:
 
     def monitor(self, old_state, verbosity):
         if verbosity > 1:
-            print(self.clock.ticks(), self.state.name(), self.tof_sensor.distance(), self.sound(), self.led.color())
+            print(self.clock.ticks, self.state.name(), self.detector.is_person_present(), self.sound(), self.led.color())
         else:
             if verbosity == 1 and self.state != old_state:
-                print('at %d %s -> %s' % (self.clock.ticks(), old_state.name(), self.state.name()))
+                print('at %d %s -> %s' % (self.clock.ticks, old_state.name(), self.state.name()))
 
     def sound(self):
         return 'buzzing' if self.buzzer.is_buzzing() else 'quiet'
-
-    def distance(self):
-        return self.tof_sensor.distance()
 
 
 

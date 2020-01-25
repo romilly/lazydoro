@@ -3,7 +3,8 @@ from collections import defaultdict
 from unittest import TestCase
 from hamcrest import assert_that, equal_to
 
-from src.lazydoro.pi.lazy_oo import Clock, ToFSensor, Buzzer, Schedule, Led, PomodoroTimer, Display
+from lazytest.helpers import MockTofSensor, MockBuzzer, MockLed
+from lazydoro.pi.lazy_oo import Clock, Schedule, PomodoroTimer, Display
 
 DURATION = 10
 BREAK = 5
@@ -12,7 +13,7 @@ TIMEOUT = 3
 
 
 class MockClock(Clock):
-    def __init__(self, schedule: Schedule, limit=31*60):
+    def __init__(self, limit=31*60):
         Clock.__init__(self)
         self.limit = limit
         self.last_event_at = 0
@@ -50,42 +51,13 @@ class MockClock(Clock):
         self._running = False
 
 
-class MockTofSensor(ToFSensor):
-    def __init__(self):
-        self._distance = 8190
-
-    def distance(self) -> int:
-        return self._distance
-
-    def person_comes(self):
-        self._distance = 390
-
-    def person_leaves(self):
-        self._distance = 8190
-
-
-class MockBuzzer(Buzzer):
-    pass
-
-
-class MockLed(Led):
-    def __init__(self):
-        self._display = Display(Display.OFF, 0)
-
-    def set_display(self, display):
-        self._display = display
-
-    def display(self):
-        return self._display
-
-
 class LazydoroTest(TestCase):
     def setUp(self):
         self.tof_sensor = MockTofSensor()
         self.buzzer = MockBuzzer()
         self.led = MockLed()
         schedule = Schedule(DURATION, BREAK, GRACE, TIMEOUT)
-        self.clock = MockClock(schedule)
+        self.clock = MockClock()
         self.pom = PomodoroTimer(self.clock, self.tof_sensor, self.buzzer, self.led, schedule)
 
     def test_can_run_a_single_pomodoro(self):
