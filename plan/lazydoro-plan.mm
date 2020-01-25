@@ -246,6 +246,17 @@
 <node TEXT="https://raspi.tv/2013/rpi-gpio-basics-4-setting-up-rpi-gpio-numbering-systems-and-inputs" ID="ID_1453752971" CREATED="1579618538519" MODIFIED="1579618538519" LINK="https://raspi.tv/2013/rpi-gpio-basics-4-setting-up-rpi-gpio-numbering-systems-and-inputs"/>
 <node TEXT="https://raspi.tv/2013/rpi-gpio-basics-3-how-to-exit-gpio-programs-cleanly-avoid-warnings-and-protect-your-pi" ID="ID_229582255" CREATED="1579618618139" MODIFIED="1579618618139" LINK="https://raspi.tv/2013/rpi-gpio-basics-3-how-to-exit-gpio-programs-cleanly-avoid-warnings-and-protect-your-pi"/>
 </node>
+<node TEXT="https://pypi.org/project/strip-hints/" ID="ID_304229077" CREATED="1579957603161" MODIFIED="1579957603161" LINK="https://pypi.org/project/strip-hints/"/>
+<node TEXT="MQTT" ID="ID_1834848069" CREATED="1579957672144" MODIFIED="1579957676728">
+<node TEXT="https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi" ID="ID_1877745565" CREATED="1579957692181" MODIFIED="1579957692181" LINK="https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi"/>
+<node TEXT="https://mosquitto.org/" ID="ID_381732729" CREATED="1579958360502" MODIFIED="1579958360502" LINK="https://mosquitto.org/"/>
+<node TEXT="https://learn.adafruit.com/alltheiot-protocols/brokers-clients" ID="ID_1127200363" CREATED="1579958379588" MODIFIED="1579958379588" LINK="https://learn.adafruit.com/alltheiot-protocols/brokers-clients"/>
+<node TEXT="https://github.com/mqtt/mqtt.github.io/wiki/servers" ID="ID_1548892500" CREATED="1579958424309" MODIFIED="1579958424309" LINK="https://github.com/mqtt/mqtt.github.io/wiki/servers"/>
+</node>
+<node TEXT="Feather WiFi" ID="ID_1691575313" CREATED="1579958334365" MODIFIED="1579958339277">
+<node TEXT="https://shop.pimoroni.com/products/adafruit-airlift-featherwing-esp32-wifi-co-processor?variant=29236658765907" ID="ID_1246713259" CREATED="1579958340326" MODIFIED="1579958340326" LINK="https://shop.pimoroni.com/products/adafruit-airlift-featherwing-esp32-wifi-co-processor?variant=29236658765907"/>
+<node TEXT="https://learn.adafruit.com/mqtt-in-circuitpython" ID="ID_1180294336" CREATED="1579958443948" MODIFIED="1579958443948" LINK="https://learn.adafruit.com/mqtt-in-circuitpython"/>
+</node>
 </node>
 </node>
 </map>

@@ -49,14 +49,16 @@ class DistanceBasedDetector(PersonDetector):
         self.sensor = sensor
         self.threshold = threshold
         self.readings = 5
-        self.results = self.readings * [False]
 
     def is_person_present(self) -> bool:
         count = 0
         for index in range(5):
-            if self.sensor.distance() < self.threshold:
+            distance = self.sensor.distance()
+            print(distance)
+            if distance < self.threshold:
                 count += 1
             sleep(0.1)
+        print(count)
         return count > 0.5 * self.readings
 
 
