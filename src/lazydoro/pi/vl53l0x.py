@@ -17,7 +17,7 @@ class VL53L0XToF(ToFSensor):
 
     def distance(self):
         distance = self.vl53.range
-        while distance == 0:
-            distance = self.vl53.range
+        # while distance == 0:
+        #     distance = self.vl53.range
         return distance
 
