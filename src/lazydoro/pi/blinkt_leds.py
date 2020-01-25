@@ -13,8 +13,8 @@ class BlinktLEDs(Led):
 
     def set_display(self, display: Display):
         self._display = display
+        index = min(7, int((8 * display.current) / display.limit))
         clear()
-        index = min(7, int(8 * display.stage))
         if display.color == Display.RED:
             set_pixel(index, 255, 0, 0)
         elif display.color == Display.YELLOW:
