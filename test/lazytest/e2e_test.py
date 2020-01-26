@@ -81,6 +81,8 @@ class LazydoroTest(TestCase):
         assert_that(self.led.display(), shows(Display.green(79, 80)))
         self.skip(1)
         assert_that(self.led.display(), shows(Display.red(0, 1)))
+        assert_that(self.buzzer.is_buzzing())
+
 
         # self.after(DURATION-1, 'still running', self.buzzer_is_quiet, self.led_is_green)
         # self.after(1, 'timer has completed', self.buzzer_is_buzzing, self.led_is_red)

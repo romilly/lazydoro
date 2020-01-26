@@ -12,7 +12,7 @@ from lazydoro.pi.vl53l0x import VL53L0XToF
 
 if __name__ == '__main__':
     detector = DistanceBasedDetector(VL53L0XToF(), 400)
-    schedule = Schedule(25*60, 5*60, 4, 4) if len(sys.argv) < 2 else Schedule(16, 8, 4, 4)
+    schedule = Schedule(25*60, 5*60, 4, 4) if len(sys.argv) < 2 else Schedule(5, 2, 1, 1) # speey demo mode
     clock = HatClock()
     buzzer = PwmBuzzer(pin=6)
     led = BlinktLEDs()

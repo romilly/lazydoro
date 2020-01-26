@@ -81,3 +81,11 @@ When I get around to re-instating the feather version intensity will actually co
 Lots of progress yesterday. Lazydoro works quite well but I need to simplify the tests and I can now see how to :)
 
 Once that's done I have a couple of minor usability changes to make.
+
+## Saturday 25 January 2020
+
+Simpler tests running well. I've also refactored the sensor code.
+
+It's working well enough to be usable, and to demonstrate on Wednesday, though I want to tweak
+it a bit, get the new code working on the feather version and add `mqtt` reporting.
+

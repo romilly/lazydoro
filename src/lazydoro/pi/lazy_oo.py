@@ -241,30 +241,26 @@ class PomodoroTimer:
         self.state = State.new_state('Waiting')
         self.led.set_display(Display.blue(0, 1))
 
-    def person_there(self) -> bool:
+    def is_person_present(self) -> bool:
         return self.detector.is_person_present()
-        # self.presence = self.presence[1:] + [1 if self.distance() < self.threshold else 0]
-        # count = sum(self.presence)
-        # return count >= 0.5 * self.WATCH_PERIOD
 
-
-    def run(self, verbosity=0):
+    def run(self, trace=0):
         while self.clock.running():
             self.clock.tick()
             old_state = self.state
-            (self.state, buzzing, color) = self.state.update(self.person_there())
+            (self.state, buzzing, color) = self.state.update(self.is_person_present())
             if buzzing:
                 self.buzzer.on()
             else:
                 self.buzzer.off()
             self.led.set_display(color)
-            self.monitor(old_state, verbosity)
+            self.monitor(old_state, trace)
 
-    def monitor(self, old_state, verbosity):
-        if verbosity > 1:
+    def monitor(self, old_state, trace):
+        if trace > 1:
             print(self.clock.ticks, self.state.name(), self.detector.is_person_present(), self.sound(), self.led.color())
         else:
-            if verbosity == 1 and self.state != old_state:
+            if trace == 1 and self.state != old_state:
                 print('at %d %s -> %s' % (self.clock.ticks, old_state.name(), self.state.name()))
 
     def sound(self):
